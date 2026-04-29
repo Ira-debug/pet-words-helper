@@ -318,6 +318,13 @@
         if (pointsEl) {
             pointsEl.textContent = getPoints();
         }
+        // 更新顶部总错词数
+        var wrongEl = document.getElementById('topWrongCount');
+        if (wrongEl) {
+            var count = getAllWrongCount();
+            wrongEl.textContent = count;
+            wrongEl.style.display = count > 0 ? 'inline' : 'none';
+        }
     }
 
     // 累计学习单词数（用于30单词积分）
@@ -501,13 +508,17 @@
     function renderDirs() {
         var container = document.getElementById('versionGroups');
         var wrongData = load(KEYS.WRONG_WORDS) || {};
+        var progressData = load(KEYS.LEARN_PROGRESS) || {};
         var groups = getVersionGroups();
 
-        // 计算每个版本的总错词数
+        // 计算每个版本的总错词数和总进度
         Object.keys(groups).forEach(function(version) {
             groups[version].totalWrong = 0;
+            groups[version].totalLearned = 0;
             groups[version].tests.forEach(function(test) {
                 groups[version].totalWrong += (wrongData[test.fullName] || []).length;
+                var learned = progressData[test.fullName] || 0;
+                groups[version].totalLearned += learned;
             });
         });
 
@@ -521,7 +532,7 @@
             html += '<div class="version-header">';
             html += '<div class="version-title">';
             html += '<span class="version-name">' + version + '</span>';
-            html += '<span class="version-info">' + group.totalWords + '词 · ' + group.tests.length + '部分</span>';
+            html += '<span class="version-info">' + group.totalLearned + '/' + group.totalWords + '词 · ' + group.tests.length + '部分</span>';
             if (group.totalWrong > 0) {
                 html += '<span class="version-wrong">' + group.totalWrong + '错</span>';
             }
@@ -532,11 +543,20 @@
             html += '<div class="tests-list">';
             group.tests.forEach(function(test) {
                 var wrongCount = (wrongData[test.fullName] || []).length;
-                html += '<div class="test-item" data-dir="' + test.fullName + '">';
+                var learned = progressData[test.fullName] || 0;
+                var total = test.wordCount;
+                var isCompleted = learned >= total;
+
+                // 已完成的卡片添加 completed 类
+                var itemClass = 'test-item' + (isCompleted ? ' completed' : '');
+                html += '<div class="' + itemClass + '" data-dir="' + test.fullName + '">';
                 html += '<span class="test-name">' + test.name + '</span>';
-                html += '<span class="test-count">' + test.wordCount + '词</span>';
+                html += '<span class="test-progress">' + learned + '/' + total + '</span>';
                 if (wrongCount > 0) {
                     html += '<span class="test-wrong">' + wrongCount + '错</span>';
+                }
+                if (isCompleted) {
+                    html += '<span class="test-done">✓</span>';
                 }
                 html += '</div>';
             });
