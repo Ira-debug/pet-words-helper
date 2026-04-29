@@ -2,7 +2,7 @@
   "name": "PET单词小助手",
   "short_name": "PET单词",
   "description": "PET青少版英语单词学习应用，支持离线使用",
-  "start_url": "/",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#667eea",
   "theme_color": "#667eea",

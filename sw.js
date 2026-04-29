@@ -1,18 +1,17 @@
-const CACHE_NAME = 'pet-words-v1';
+const CACHE_NAME = 'pet-words-v2';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/css/style.css',
-  '/js/app.js',
-  '/js/pet_words_compact.js',
-  '/js/pet_words.js',
-  '/js/storage.js',
-  '/js/vocabulary.js',
-  '/js/quiz.js',
-  '/js/images.js',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  './index.html',
+  './css/style.css',
+  './js/app.js',
+  './js/pet_words_compact.js',
+  './js/pet_words.js',
+  './js/storage.js',
+  './js/vocabulary.js',
+  './js/quiz.js',
+  './js/images.js',
+  './manifest.json',
+  './icons/icon-192.png',
+  './icons/icon-512.png'
 ];
 
 // 安装事件 - 缓存静态资源
@@ -71,7 +70,7 @@ self.addEventListener('fetch', (event) => {
           .catch(() => {
             // 离线时返回一个简单的响应
             if (event.request.mode === 'navigate') {
-              return caches.match('/index.html');
+              return caches.match('./index.html');
             }
           });
       })
