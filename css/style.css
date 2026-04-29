@@ -418,16 +418,6 @@ body {
     display: inline-block;
 }
 
-.learn-count-hint {
-    text-align: center;
-    padding: 12px 18px;
-    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
-    border-radius: 12px;
-    color: #43a047;
-    font-size: 0.95rem;
-    margin-bottom: 20px;
-}
-
 /* 按钮 - 柔和圆角 */
 .btn {
     display: inline-block;
@@ -478,7 +468,7 @@ body {
     display: flex;
     justify-content: center;
     gap: 18px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     margin-top: 24px;
 }
 
@@ -1312,11 +1302,6 @@ body {
 
     .progress-text {
         color: #c8e6c9;
-    }
-
-    .learn-count-hint {
-        background: linear-gradient(135deg, #2e5a3a 0%, #1a3a2a 100%);
-        color: #81c784;
     }
 
     .letter-btn {

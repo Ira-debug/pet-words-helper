@@ -40,6 +40,7 @@
     var allWordsOriginal = [];   // 目录全部单词原始列表（复习时保留）
     var currentWords = [];       // 当前学习批次（未学习的）
     var learnedWords = [];       // 本次已学习的单词（用于测试）
+    var previousWord = null;     // 上一个单词（用于左滑返回）
     var currentIndex = 0;        // 当前单词索引
     var currentWord = null;
     var sessionLearned = 0;      // 本次学习总数
@@ -417,6 +418,16 @@
         var pages = document.querySelectorAll('.page');
         pages.forEach(function(p) { p.classList.remove('active'); });
         document.getElementById('page-' + pageId).classList.add('active');
+
+        // 顶部功能区只在首页显示
+        var topBar = document.querySelector('.top-bar');
+        if (topBar) {
+            if (pageId === 'home') {
+                topBar.style.display = 'flex';
+            } else {
+                topBar.style.display = 'none';
+            }
+        }
     }
 
     function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
@@ -443,18 +454,6 @@
         var percent = total > 0 ? (current / total) * 100 : 0;
         document.getElementById('testProgressFill').style.width = percent + '%';
         document.getElementById('testProgressText').textContent = current + ' / ' + total;
-    }
-
-    // 学习计数提示
-    function updateLearnCountHint() {
-        var learned = learnedWords.length;
-        var need = learnBatchSize - learned;
-        if (need <= 0) {
-            document.getElementById('learnCountHint').textContent = '准备开始测试！';
-        } else {
-            document.getElementById('learnCountHint').textContent =
-                '已学习 ' + learned + ' 个单词，还需学习 ' + need + ' 个开始测试';
-        }
     }
 
     // ===== 目录解析与分组 =====
@@ -647,6 +646,66 @@
         showNextWordToLearn();
     }
 
+    // ===== 左滑手势返回上一单词 =====
+    function setupSwipeGesture() {
+        var learnArea = document.getElementById('learnArea');
+        var touchStartX = 0;
+        var touchEndX = 0;
+        var minSwipeDistance = 80; // 最小滑动距离
+
+        learnArea.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+
+        learnArea.addEventListener('touchmove', function(e) {
+            touchEndX = e.touches[0].clientX;
+        }, { passive: true });
+
+        learnArea.addEventListener('touchend', function(e) {
+            var swipeDistance = touchEndX - touchStartX;
+
+            // 左滑：从右向左（距离为负数）
+            if (swipeDistance < -minSwipeDistance) {
+                goBackToPreviousWord();
+            }
+        }, { passive: true });
+
+        // 重置触摸坐标
+        touchStartX = 0;
+        touchEndX = 0;
+    }
+
+    // 返回上一个单词
+    function goBackToPreviousWord() {
+        if (!previousWord) {
+            // 没有上一个单词
+            return;
+        }
+
+        // 将当前单词重新放回队列前面
+        if (currentWord) {
+            currentWords.unshift(currentWord);
+            currentIndex--;
+            sessionLearned--;
+            sessionLearnCount--;
+
+            // 从已学习队列移除
+            var idx = learnedWords.indexOf(currentWord);
+            if (idx > -1) {
+                learnedWords.splice(idx, 1);
+            }
+
+            // 如果是错词，也要移除（如果是刚标记的）
+            // 这里简化处理：只恢复到上一个单词显示
+        }
+
+        // 显示上一个单词
+        currentWord = previousWord;
+        previousWord = null; // 清空，防止重复返回
+        showWordCard(currentWord);
+        updateLearnProgress();
+    }
+
     // ===== 学习流程 =====
     function showNextWordToLearn() {
         if (currentWords.length === 0) {
@@ -655,10 +714,14 @@
             return;
         }
 
+        // 记录当前单词作为上一个单词（用于左滑返回）
+        if (currentWord) {
+            previousWord = currentWord;
+        }
+
         currentWord = currentWords[0];
         showWordCard(currentWord);
         updateLearnProgress();
-        updateLearnCountHint();
     }
 
     function showWordCard(word) {
@@ -683,9 +746,6 @@
         currentIndex++;
         sessionLearned++;
         sessionLearnCount++;  // 累计学习数
-
-        // 更新学习计数提示
-        updateLearnCountHint();
 
         if (!isReviewMode) {
             saveProgress(currentDir, currentIndex);
@@ -724,9 +784,6 @@
         currentIndex++;
         sessionLearned++;
         sessionLearnCount++;  // 累计学习数
-
-        // 更新学习计数提示
-        updateLearnCountHint();
 
         if (!isReviewMode) {
             saveProgress(currentDir, currentIndex);
@@ -1590,6 +1647,9 @@
         // 学习按钮
         document.getElementById('rememberedBtn').addEventListener('click', onRemembered);
         document.getElementById('notSureBtn').addEventListener('click', onNotSure);
+
+        // 左滑返回上一单词
+        setupSwipeGesture();
 
         // 测试选项点击
         document.getElementById('testOptions').addEventListener('click', onOptionClick);
