@@ -1,7 +1,7 @@
 {
-  "name": "PET单词小助手",
-  "short_name": "PET单词",
-  "description": "PET青少版英语单词学习应用，支持离线使用",
+  "name": "PET真题背诵词汇",
+  "short_name": "PET词汇",
+  "description": "PET真题英语单词背诵应用，支持离线使用",
   "start_url": "/pet-words-helper/index.html",
   "scope": "/pet-words-helper/",
   "display": "standalone",

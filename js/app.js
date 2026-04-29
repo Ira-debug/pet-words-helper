@@ -1,14 +1,14 @@
 // app.js - 主逻辑（改进版）
 
 (function() {
-    // 存储键
+    // 存储键 - v2 版本（词库更新后清空旧数据）
     var KEYS = {
-        WRONG_WORDS: 'pet_wrong_words',
-        LEARN_PROGRESS: 'pet_learn_progress',
-        STATS: 'pet_stats',
-        POINTS: 'pet_points',              // 总积分
-        LEARNED_WORDS_COUNT: 'pet_learned_count', // 累计学习单词数（用于30单词积分）
-        CLEARED_WRONG_COUNT: 'pet_cleared_wrong_count' // 累计消灭错词数（用于20错词积分）
+        WRONG_WORDS: 'pet_wrong_words_v2',
+        LEARN_PROGRESS: 'pet_learn_progress_v2',
+        STATS: 'pet_stats_v2',
+        POINTS: 'pet_points_v2',
+        LEARNED_WORDS_COUNT: 'pet_learned_count_v2',
+        CLEARED_WRONG_COUNT: 'pet_cleared_wrong_count_v2'
     };
 
     // Emoji映射
