@@ -43,13 +43,21 @@
         <div id="page-home" class="page active">
             <div class="card">
                 <h2>选择学习内容</h2>
-                <p class="hint">选择你想学习的单词目录开始今天的学习吧</p>
+                <p class="hint">选择版本和测试部分开始学习</p>
 
-                <!-- 第一层目录 -->
-                <div class="level1-section">
-                    <h3>PET青少版全真模拟题</h3>
+                <!-- 一级目录：版本选择 -->
+                <div class="level1-grid" id="level1Grid">
+                    <!-- 动态生成版本卡片 -->
+                </div>
+
+                <!-- 二级目录：测试部分（点击版本后显示） -->
+                <div id="level2Section" class="level2-section hidden">
+                    <div class="level2-header">
+                        <button class="btn-back-small" id="backToLevel1Btn">← 返回</button>
+                        <h3 id="level2Title">选择测试部分</h3>
+                    </div>
                     <div class="level2-grid" id="level2Grid">
-                        <!-- 动态生成第二层目录 -->
+                        <!-- 动态生成测试部分卡片 -->
                     </div>
                 </div>
             </div>

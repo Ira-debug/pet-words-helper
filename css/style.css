@@ -143,6 +143,11 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 /* 卡片通用 - 柔和白色背景 */
 .card {
     background: rgba(255, 255, 255, 0.95);
@@ -166,82 +171,135 @@ body {
     font-size: 0.95rem;
 }
 
-/* 目录选择页面 */
-.level1-section {
-    margin-bottom: 24px;
+/* 目录选择页面 - 二级目录结构 */
+.level1-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 14px;
 }
 
-.level1-section h3 {
-    color: #388e3c;
+.version-card {
+    background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e9 100%);
+    border-radius: 14px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    text-align: center;
+}
+
+.version-card:hover {
+    transform: translateY(-4px);
+    border-color: #81c784;
+    box-shadow: 0 8px 24px rgba(67, 160, 71, 0.15);
+}
+
+.version-name {
+    font-weight: 600;
+    font-size: 1.05rem;
+    color: #2e5a3a;
+    margin-bottom: 4px;
+}
+
+.version-stats {
+    font-size: 0.75rem;
+    color: #81c784;
+}
+
+.version-wrong-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #ef5350;
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+/* 二级目录区域 */
+.level2-section {
+    animation: fadeIn 0.3s ease;
+}
+
+.level2-section.hidden {
+    display: none;
+}
+
+.level2-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     margin-bottom: 16px;
     padding-bottom: 10px;
     border-bottom: 2px solid #c8e6c9;
+}
+
+.level2-header h3 {
+    color: #388e3c;
     font-weight: 600;
-    letter-spacing: 0.3px;
+    margin: 0;
 }
 
-.level2-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
+.btn-back-small {
+    padding: 6px 12px;
+    background: #e8f5e9;
+    border: 1px solid #81c784;
+    border-radius: 8px;
+    color: #43a047;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.dir-card {
+.btn-back-small:hover {
+    background: #c8e6c9;
+}
+
+/* 测试部分卡片 */
+.test-card {
     background: linear-gradient(135deg, #f1f8e9 0%, #e8f5e9 100%);
-    border-radius: 14px;
-    padding: 18px;
+    border-radius: 12px;
+    padding: 14px;
     cursor: pointer;
     transition: all 0.3s ease;
     border: 2px solid transparent;
     position: relative;
 }
 
-.dir-card:hover {
-    transform: translateY(-4px);
+.test-card:hover {
+    transform: translateY(-2px);
     border-color: #81c784;
-    box-shadow: 0 8px 24px rgba(67, 160, 71, 0.15);
+    box-shadow: 0 6px 16px rgba(67, 160, 71, 0.12);
 }
 
-.dir-card.selected {
-    border-color: #43a047;
-    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
-    color: white;
+.test-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+    color: #2e5a3a;
+    margin-bottom: 4px;
 }
 
-.dir-name {
-    font-weight: 600;
-    margin-bottom: 6px;
-    font-size: 1rem;
-    letter-spacing: 0.3px;
-}
-
-.dir-count {
-    font-size: 0.85rem;
+.test-count {
+    font-size: 0.8rem;
     color: #81c784;
 }
 
-.dir-card.selected .dir-count {
-    color: rgba(255,255,255,0.85);
-}
-
-.dir-wrong-badge {
+.test-wrong-badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 8px;
+    right: 8px;
     background: #ef5350;
     color: white;
-    border-radius: 10px;
-    padding: 3px 8px;
-    font-size: 0.75rem;
+    border-radius: 8px;
+    padding: 2px 5px;
+    font-size: 0.7rem;
     font-weight: 600;
 }
 
-.stats-entry {
-    margin-top: 24px;
-    text-align: center;
-}
-
-/* 学习页面 - 更大呼吸感 */
+/* 统计页面 */
 .learn-container {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 20px;

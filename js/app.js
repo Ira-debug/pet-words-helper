@@ -457,32 +457,136 @@
         }
     }
 
+    // ===== 目录解析与分组 =====
+    // 解析目录名称，提取版本和测试部分
+    function parseDirName(dirName) {
+        // 格式示例:
+        // "全真模拟题 Test1" -> version: "全真模拟题", test: "Test1"
+        // "青少版1 Test1 阅读Part1" -> version: "青少版1", test: "Test1 阅读Part1"
+        // "标准版1 Test3 阅读" -> version: "标准版1", test: "Test3 阅读"
+
+        var parts = dirName.split(' ');
+        if (parts.length >= 2) {
+            // 第一个部分是版本名
+            var version = parts[0];
+            // 剩余部分是测试名
+            var test = parts.slice(1).join(' ');
+            return { version: version, test: test, fullName: dirName };
+        }
+        return { version: dirName, test: '', fullName: dirName };
+    }
+
+    // 获取所有版本的分组
+    function getVersionGroups() {
+        var groups = {};
+        Object.keys(PET_WORDS.level2_dirs).forEach(function(dir) {
+            var parsed = parseDirName(dir);
+            if (!groups[parsed.version]) {
+                groups[parsed.version] = {
+                    name: parsed.version,
+                    tests: [],
+                    totalWords: 0,
+                    totalWrong: 0
+                };
+            }
+            var words = PET_WORDS.level2_dirs[dir];
+            groups[parsed.version].tests.push({
+                name: parsed.test,
+                fullName: dir,
+                wordCount: words.length
+            });
+            groups[parsed.version].totalWords += words.length;
+        });
+        return groups;
+    }
+
+    // 当前选中的版本
+    var currentVersion = null;
+
     // ===== 目录渲染 =====
     function renderDirs() {
-        var grid = document.getElementById('level2Grid');
-        var html = '';
+        var level1Grid = document.getElementById('level1Grid');
         var wrongData = load(KEYS.WRONG_WORDS) || {};
+        var groups = getVersionGroups();
 
-        Object.keys(PET_WORDS.level2_dirs).forEach(function(dir) {
-            var words = PET_WORDS.level2_dirs[dir];
-            var wrongCount = (wrongData[dir] || []).length;
+        // 计算每个版本的总错词数
+        Object.keys(groups).forEach(function(version) {
+            groups[version].totalWrong = 0;
+            groups[version].tests.forEach(function(test) {
+                groups[version].totalWrong += (wrongData[test.fullName] || []).length;
+            });
+        });
 
-            html += '<div class="dir-card" data-dir="' + dir + '">';
-            html += '<div class="dir-name">' + dir + '</div>';
-            html += '<div class="dir-count">' + words.length + '词</div>';
-            if (wrongCount > 0) {
-                html += '<div class="dir-wrong-badge">' + wrongCount + '错</div>';
+        // 渲染一级目录（版本）
+        var html = '';
+        Object.keys(groups).forEach(function(version) {
+            var group = groups[version];
+            html += '<div class="version-card" data-version="' + version + '">';
+            html += '<div class="version-name">' + version + '</div>';
+            html += '<div class="version-stats">' + group.totalWords + '词 · ' + group.tests.length + '部分</div>';
+            if (group.totalWrong > 0) {
+                html += '<div class="version-wrong-badge">' + group.totalWrong + '错</div>';
             }
             html += '</div>';
         });
 
-        grid.innerHTML = html;
+        level1Grid.innerHTML = html;
 
-        grid.querySelectorAll('.dir-card').forEach(function(card) {
+        // 绑定点击事件
+        level1Grid.querySelectorAll('.version-card').forEach(function(card) {
+            card.addEventListener('click', function() {
+                selectVersion(card.dataset.version);
+            });
+        });
+
+        // 返回按钮
+        document.getElementById('backToLevel1Btn').addEventListener('click', function() {
+            showLevel1();
+        });
+    }
+
+    // 选择版本，显示二级目录
+    function selectVersion(version) {
+        currentVersion = version;
+        var groups = getVersionGroups();
+        var group = groups[version];
+        var wrongData = load(KEYS.WRONG_WORDS) || {};
+
+        // 显示二级目录区域
+        document.getElementById('level1Grid').classList.add('hidden');
+        document.getElementById('level2Section').classList.remove('hidden');
+        document.getElementById('level2Title').textContent = version;
+
+        // 渲染二级目录（测试部分）
+        var level2Grid = document.getElementById('level2Grid');
+        var html = '';
+
+        group.tests.forEach(function(test) {
+            var wrongCount = (wrongData[test.fullName] || []).length;
+            html += '<div class="test-card" data-dir="' + test.fullName + '">';
+            html += '<div class="test-name">' + test.name + '</div>';
+            html += '<div class="test-count">' + test.wordCount + '词</div>';
+            if (wrongCount > 0) {
+                html += '<div class="test-wrong-badge">' + wrongCount + '错</div>';
+            }
+            html += '</div>';
+        });
+
+        level2Grid.innerHTML = html;
+
+        // 绑定点击事件
+        level2Grid.querySelectorAll('.test-card').forEach(function(card) {
             card.addEventListener('click', function() {
                 selectDir(card.dataset.dir);
             });
         });
+    }
+
+    // 返回一级目录
+    function showLevel1() {
+        currentVersion = null;
+        document.getElementById('level1Grid').classList.remove('hidden');
+        document.getElementById('level2Section').classList.add('hidden');
     }
 
     // ===== 选择目录 =====
