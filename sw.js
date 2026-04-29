@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pet-words-v3';
+const CACHE_NAME = 'pet-words-v4';
 const STATIC_ASSETS = [
   './index.html',
   './css/style.css',
