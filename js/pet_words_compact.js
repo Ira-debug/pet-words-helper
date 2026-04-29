@@ -1028,7 +1028,8 @@ var PET_WORDS={
 {"word":"request","chinese":"要求"},
 {"word":"demand","chinese":"需求"},
 {"word":"spilt","chinese":"洒出"},
-{"word":"PET","chinese":"标准版1 Test4听力"},
+],
+"标准版1 Test4 听力":[
 {"word":"hostel","chinese":"招待所"},
 {"word":"recover","chinese":"恢复"},
 {"word":"interval","chinese":"间隔/中间休息"},
@@ -1062,7 +1063,8 @@ var PET_WORDS={
 {"word":"cure","chinese":"治疗"},
 {"word":"obviously","chinese":"明显地"},
 {"word":"carry out","chinese":"实行"},
-{"word":"PET","chinese":"青少版3 Test1听力"},
+],
+"青少版3 Test1 听力":[
 {"word":"complain about","chinese":"抱怨"},
 {"word":"confused","chinese":"迷惑的"},
 ],
@@ -1113,8 +1115,7 @@ var PET_WORDS={
 {"word":"extraordinarily","chinese":"非凡地/不一样地"},
 {"word":"film clip","chinese":"电影剪辑"},
 {"word":"lonely","chinese":"孤单的"},
-{"word":"solve","chinese":"/"},
-{"word":"work out","chinese":"解决"},
+{"word":"solve/work out","chinese":"解决"},
 {"word":"relieve","chinese":"释放/减轻"},
 {"word":"be willing to","chinese":"愿意"},
 {"word":"psychology","chinese":"心理学"},
@@ -1135,8 +1136,9 @@ var PET_WORDS={
 {"word":"behaviour","chinese":"行为"},
 {"word":"volume","chinese":"体积/容积"},
 {"word":"pronounce","chinese":"发音"},
-{"word":"PET","chinese":"青少版3 Test4replace/"},
-{"word":"take place","chinese":"代替"},
+],
+"青少版3 Test4":[
+{"word":"replace/take place","chinese":"代替"},
 {"word":"tyre","chinese":"轮胎"},
 {"word":"require","chinese":"需要"},
 {"word":"sore","chinese":"疼痛的"},
@@ -1155,6 +1157,6 @@ var PET_WORDS={
 {"word":"decrease","chinese":"减少/降低"},
 {"word":"absent","chinese":"缺席"},
 {"word":"peaceful","chinese":"平静的"},
-],
+]
 }
 };
