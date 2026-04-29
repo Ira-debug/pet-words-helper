@@ -776,14 +776,14 @@ var PET_WORDS={
 {"word":"interview","chinese":"采访"},
 {"word":"rescue","chinese":"救护"},
 ],
-"青少版2 Test3 阅读Part1":[
+"青少版3 Test3 阅读Part1":[
 {"word":"confirm","chinese":"确认"},
 {"word":"baggage","chinese":"行李"},
 {"word":"maximum","chinese":"最大值"},
 {"word":"in advance","chinese":"提前"},
 {"word":"independent","chinese":"独立的"},
 ],
-"青少版2 Test3 阅读Part2&3":[
+"青少版3 Test3 阅读Part2&3":[
 {"word":"predict","chinese":"预测"},
 {"word":"pattern","chinese":"模式"},
 {"word":"affect","chinese":"影响"},
@@ -804,7 +804,7 @@ var PET_WORDS={
 {"word":"select","chinese":"选择"},
 {"word":"attitude","chinese":"态度"},
 ],
-"青少版2 Test3 阅读Part5&6":[
+"青少版3 Test3 阅读Part5&6":[
 {"word":"schedule","chinese":"日程表"},
 {"word":"slightly","chinese":"轻微地"},
 {"word":"pressure","chinese":"压力"},
@@ -814,7 +814,7 @@ var PET_WORDS={
 {"word":"remove","chinese":"移动"},
 {"word":"method","chinese":"措施"},
 ],
-"青少版2 Test3 听力":[
+"青少版3 Test3 听力":[
 {"word":"behaviour","chinese":"行为"},
 {"word":"attend","chinese":"参加"},
 {"word":"bandage","chinese":"绷带"},
@@ -1097,7 +1097,7 @@ var PET_WORDS={
 {"word":"involve in","chinese":"包含"},
 {"word":"depart from","chinese":"出发"},
 ],
-"青少版2 Test3":[
+"青少版3 Test3":[
 {"word":"forbidden","chinese":"禁止的"},
 {"word":"graphic","chinese":"图表的"},
 {"word":"beneath","chinese":"在下面"},
