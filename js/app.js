@@ -467,9 +467,7 @@
 
         var parts = dirName.split(' ');
         if (parts.length >= 2) {
-            // 第一个部分是版本名
             var version = parts[0];
-            // 剩余部分是测试名
             var test = parts.slice(1).join(' ');
             return { version: version, test: test, fullName: dirName };
         }
@@ -500,12 +498,9 @@
         return groups;
     }
 
-    // 当前选中的版本
-    var currentVersion = null;
-
-    // ===== 目录渲染 =====
+    // ===== 目录渲染 - 全部展开显示 =====
     function renderDirs() {
-        var level1Grid = document.getElementById('level1Grid');
+        var container = document.getElementById('versionGroups');
         var wrongData = load(KEYS.WRONG_WORDS) || {};
         var groups = getVersionGroups();
 
@@ -517,76 +512,47 @@
             });
         });
 
-        // 渲染一级目录（版本）
+        // 渲染所有版本分组 - 默认全部展开
         var html = '';
         Object.keys(groups).forEach(function(version) {
             var group = groups[version];
-            html += '<div class="version-card" data-version="' + version + '">';
-            html += '<div class="version-name">' + version + '</div>';
-            html += '<div class="version-stats">' + group.totalWords + '词 · ' + group.tests.length + '部分</div>';
+
+            // 版本标题栏
+            html += '<div class="version-group">';
+            html += '<div class="version-header">';
+            html += '<div class="version-title">';
+            html += '<span class="version-name">' + version + '</span>';
+            html += '<span class="version-info">' + group.totalWords + '词 · ' + group.tests.length + '部分</span>';
             if (group.totalWrong > 0) {
-                html += '<div class="version-wrong-badge">' + group.totalWrong + '错</div>';
+                html += '<span class="version-wrong">' + group.totalWrong + '错</span>';
             }
+            html += '</div>';
+            html += '</div>';
+
+            // 测试部分列表 - 始终展开
+            html += '<div class="tests-list">';
+            group.tests.forEach(function(test) {
+                var wrongCount = (wrongData[test.fullName] || []).length;
+                html += '<div class="test-item" data-dir="' + test.fullName + '">';
+                html += '<span class="test-name">' + test.name + '</span>';
+                html += '<span class="test-count">' + test.wordCount + '词</span>';
+                if (wrongCount > 0) {
+                    html += '<span class="test-wrong">' + wrongCount + '错</span>';
+                }
+                html += '</div>';
+            });
+            html += '</div>';
             html += '</div>';
         });
 
-        level1Grid.innerHTML = html;
+        container.innerHTML = html;
 
-        // 绑定点击事件
-        level1Grid.querySelectorAll('.version-card').forEach(function(card) {
-            card.addEventListener('click', function() {
-                selectVersion(card.dataset.version);
+        // 绑定测试部分点击事件
+        container.querySelectorAll('.test-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                selectDir(item.dataset.dir);
             });
         });
-
-        // 返回按钮
-        document.getElementById('backToLevel1Btn').addEventListener('click', function() {
-            showLevel1();
-        });
-    }
-
-    // 选择版本，显示二级目录
-    function selectVersion(version) {
-        currentVersion = version;
-        var groups = getVersionGroups();
-        var group = groups[version];
-        var wrongData = load(KEYS.WRONG_WORDS) || {};
-
-        // 显示二级目录区域
-        document.getElementById('level1Grid').classList.add('hidden');
-        document.getElementById('level2Section').classList.remove('hidden');
-        document.getElementById('level2Title').textContent = version;
-
-        // 渲染二级目录（测试部分）
-        var level2Grid = document.getElementById('level2Grid');
-        var html = '';
-
-        group.tests.forEach(function(test) {
-            var wrongCount = (wrongData[test.fullName] || []).length;
-            html += '<div class="test-card" data-dir="' + test.fullName + '">';
-            html += '<div class="test-name">' + test.name + '</div>';
-            html += '<div class="test-count">' + test.wordCount + '词</div>';
-            if (wrongCount > 0) {
-                html += '<div class="test-wrong-badge">' + wrongCount + '错</div>';
-            }
-            html += '</div>';
-        });
-
-        level2Grid.innerHTML = html;
-
-        // 绑定点击事件
-        level2Grid.querySelectorAll('.test-card').forEach(function(card) {
-            card.addEventListener('click', function() {
-                selectDir(card.dataset.dir);
-            });
-        });
-    }
-
-    // 返回一级目录
-    function showLevel1() {
-        currentVersion = null;
-        document.getElementById('level1Grid').classList.remove('hidden');
-        document.getElementById('level2Section').classList.add('hidden');
     }
 
     // ===== 选择目录 =====
