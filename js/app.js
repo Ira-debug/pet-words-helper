@@ -440,10 +440,6 @@
     function showModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function hideModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-    function updateNav(text) {
-        document.getElementById('navLocation').textContent = text;
-    }
-
     // ===== 进度条 =====
     // 学习页面的进度条显示：目录总进度
     function updateLearnProgress() {
@@ -599,8 +595,6 @@
         sessionLearnCount = 0;  // 重置累计学习计数
         needMatchAfterTest = false;  // 重置连线测试标记
         isReviewMode = false;
-
-        updateNav(dir);
 
         // 确保显示学习区域（隐藏测试区域）
         document.getElementById('learnArea').classList.remove('hidden');
@@ -1583,8 +1577,6 @@
         needMatchAfterTest = false;
         wrongWordsClearedThisRound = 0;
 
-        updateNav('总错题库复习');
-
         document.getElementById('learnArea').classList.remove('hidden');
         document.getElementById('testArea').classList.add('hidden');
         document.getElementById('matchArea').classList.add('hidden');
@@ -1634,8 +1626,6 @@
         sessionLearnCount = 0;
         needMatchAfterTest = false;
         wrongWordsClearedThisRound = 0;
-
-        updateNav(currentDir + ' 错词复习');
 
         document.getElementById('learnArea').classList.remove('hidden');
         document.getElementById('testArea').classList.add('hidden');
