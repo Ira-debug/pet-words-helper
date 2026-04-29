@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="64" fill="url(#grad)"/>
+  <g transform="translate(128, 120)">
+    <!-- Book shape -->
+    <path d="M0 40 L0 280 Q0 300 20 300 L160 300 Q180 300 180 280 L180 40 Q180 20 160 20 L20 20 Q0 20 0 40 Z" fill="#fff" opacity="0.95"/>
+    <!-- Book spine -->
+    <rect x="0" y="20" width="20" height="280" fill="#e0e0e0"/>
+    <!-- Page lines -->
+    <rect x="30" y="60" width="130" height="8" rx="4" fill="#667eea" opacity="0.6"/>
+    <rect x="30" y="90" width="100" height="6" rx="3" fill="#764ba2" opacity="0.5"/>
+    <rect x="30" y="110" width="120" height="6" rx="3" fill="#667eea" opacity="0.4"/>
+    <rect x="30" y="130" width="90" height="6" rx="3" fill="#764ba2" opacity="0.5"/>
+    <!-- ABC text -->
+    <text x="90" y="220" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#667eea" text-anchor="middle">ABC</text>
+  </g>
+</svg>
