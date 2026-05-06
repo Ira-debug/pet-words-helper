@@ -764,7 +764,18 @@ body {
     box-shadow: 0 2px 8px rgba(67, 160, 71, 0.1);
 }
 
-/* 只在支持真正hover的设备上启用hover效果（移动端touch不触发） */
+/* 移动端不使用hover，避免touch残留 */
+@media (hover: none) {
+    .test-option:hover {
+        background: white;
+        border-color: #81c784;
+        color: #2e5a3a;
+        transform: none;
+        box-shadow: 0 2px 8px rgba(67, 160, 71, 0.1);
+    }
+}
+
+/* 只在支持hover的设备（非touch）上启用hover效果 */
 @media (hover: hover) and (pointer: fine) {
     .test-option:hover {
         border-color: #43a047;
@@ -773,14 +784,6 @@ body {
         transform: translateY(-3px);
         box-shadow: 0 4px 16px rgba(67, 160, 71, 0.2);
     }
-}
-
-/* 移动端使用active代替hover */
-.test-option:active {
-    border-color: #43a047;
-    background: linear-gradient(135deg, #66bb6a 0%, #43a047 100%);
-    color: white;
-    transform: translateY(-2px);
 }
 
 .test-option.selected {

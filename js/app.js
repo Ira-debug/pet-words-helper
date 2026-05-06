@@ -67,20 +67,20 @@
     var matchSelectedWord = null; // 当前选中的英文单词索引
     var matchSelectedChinese = null; // 当前选中的中文索引
 
-    // ===== 发音功能（Chrome bug修复版）=====
-    // Chrome Web Speech API bug: 发音15秒后会自动暂停，需要定期resume
+    // ===== 发音功能 =====
+    var lastPronounceText = '';  // 记录上次发音的文本，防止重复
 
     function pronounce(text) {
         if (!('speechSynthesis' in window)) return;
 
+        // 如果和上次发音相同，跳过（防止重复）
+        if (lastPronounceText === text) {
+            return;
+        }
+        lastPronounceText = text;
+
         // 强制取消所有待发音的内容
         window.speechSynthesis.cancel();
-
-        // 清空发音队列
-        while (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
-            window.speechSynthesis.cancel();
-            break;  // 只循环一次，cancel会清空队列
-        }
 
         // 创建 utterance
         var utterance = new SpeechSynthesisUtterance(text);
@@ -94,28 +94,20 @@
             if (enVoice) utterance.voice = enVoice;
         }
 
-        // 关键修复：在所有事件中调用 resume
-        utterance.onstart = function() {
-            window.speechSynthesis.resume();
-        };
+        // 发音完成后清除记录，允许再次发音同一文本
         utterance.onend = function() {
-            window.speechSynthesis.resume();
+            lastPronounceText = '';
         };
         utterance.onerror = function() {
-            window.speechSynthesis.resume();
+            lastPronounceText = '';
         };
 
-        // 直接发音，不延迟（延迟可能导致队列堆积）
+        // 发音
         window.speechSynthesis.speak(utterance);
-        window.speechSynthesis.resume();
     }
 
-    // 定期调用 resume 保持引擎活跃（Chrome bug修复）
-    setInterval(function() {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.resume();
-        }
-    }, 3000);
+    // 定期调用 resume 保持引擎活跃（Chrome bug修复）- 可能导致发音错乱，已移除
+    // 改用每次发音时直接处理
 
     // 错误提示音
     function playErrorSound() {
@@ -980,12 +972,19 @@
             }).join('');
             optionsEl.innerHTML = html;
 
-            // 清除任何可能的选中状态和focus状态
+            // 清除任何可能的选中状态和focus状态，以及内联样式
             optionsEl.querySelectorAll('.test-option').forEach(function(opt) {
                 opt.classList.remove('selected', 'correct', 'wrong');
+                // 强制清除所有内联样式（移动端hover残留）
+                opt.style.backgroundColor = '';
+                opt.style.borderColor = '';
+                opt.style.color = '';
+                opt.style.transform = '';
+                opt.style.boxShadow = '';
+                opt.style.pointerEvents = 'auto';
             });
             // 清除当前focus状态
-            if (document.activeElement && document.activeElement.classList.contains('test-option')) {
+            if (document.activeElement) {
                 document.activeElement.blur();
             }
 
@@ -1436,6 +1435,17 @@
 
         var answer = option.dataset.answer;
         if (!answer) return;
+
+        // 先清除所有选项的选中状态（防止移动端hover残留）
+        document.querySelectorAll('.test-option').forEach(function(opt) {
+            opt.classList.remove('selected', 'hover-active');
+            // 强制清除hover样式
+            opt.style.backgroundColor = '';
+            opt.style.borderColor = '';
+            opt.style.color = '';
+            opt.style.transform = '';
+            opt.style.boxShadow = '';
+        });
 
         var isCorrect;
         if (currentTestType === TEST_TYPES.CHOOSE_CHINESE) {
