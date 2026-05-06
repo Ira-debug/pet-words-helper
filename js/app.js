@@ -906,6 +906,9 @@
         var testHintEl = document.getElementById('testHint');
         var optionsEl = document.getElementById('testOptions');
 
+        // 清空选项容器，确保没有任何遗留状态
+        optionsEl.innerHTML = '';
+
         if (currentTestType === TEST_TYPES.CHOOSE_CHINESE) {
             testWordEl.textContent = currentWord.word;
             testHintEl.textContent = '选出正确的中文意思哦~';
@@ -939,6 +942,15 @@
             }).join('');
             optionsEl.innerHTML = html;
 
+            // 清除任何可能的选中状态和focus状态
+            optionsEl.querySelectorAll('.test-option').forEach(function(opt) {
+                opt.classList.remove('selected', 'correct', 'wrong');
+            });
+            // 清除当前focus状态
+            if (document.activeElement && document.activeElement.classList.contains('test-option')) {
+                document.activeElement.blur();
+            }
+
         } else {
             // 选英文单词
             testWordEl.textContent = currentWord.chinese;
@@ -966,6 +978,15 @@
                 return '<div class="test-option" data-answer="' + opt + '">' + opt + '</div>';
             }).join('');
             optionsEl.innerHTML = html;
+
+            // 清除任何可能的选中状态和focus状态
+            optionsEl.querySelectorAll('.test-option').forEach(function(opt) {
+                opt.classList.remove('selected', 'correct', 'wrong');
+            });
+            // 清除当前focus状态
+            if (document.activeElement && document.activeElement.classList.contains('test-option')) {
+                document.activeElement.blur();
+            }
         }
     }
 
