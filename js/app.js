@@ -802,9 +802,8 @@
                 startTestSession(false);
             }
         } else if (currentWords.length === 0) {
-            console.log('>>> 没有更多单词，直接开始测试');
-            // 如果没有更多单词了，直接开始测试
-            startTestSession(sessionLearnCount >= matchBatchSize);
+            // 没有更多单词了，不足3个就直接结束
+            showComplete();
         } else {
             // 继续学习
             showNextWordToLearn();
@@ -839,7 +838,8 @@
                 startTestSession(false);
             }
         } else if (currentWords.length === 0) {
-            startTestSession(sessionLearnCount >= matchBatchSize);
+            // 没有更多单词了，不足3个就直接结束
+            showComplete();
         } else {
             showNextWordToLearn();
         }
@@ -910,9 +910,8 @@
         console.log('当前单词:', currentWord.word);
         console.log('测试队列:', testWordsQueue.map(function(w) { return w.word; }));
 
-        // 随机选择测试类型
-        var types = [TEST_TYPES.CHOOSE_CHINESE, TEST_TYPES.CHOOSE_WORD];
-        currentTestType = types[Math.floor(Math.random() * types.length)];
+        // 固定测试类型为英译中
+        currentTestType = TEST_TYPES.CHOOSE_CHINESE;
 
         updateTestProgress();
 
