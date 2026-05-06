@@ -715,8 +715,13 @@
 
     // 返回上一个单词
     function goBackToPreviousWord() {
+        console.log('=== goBackToPreviousWord 被调用！===');
+        console.log('previousWord:', previousWord ? previousWord.word : 'null');
+        console.trace('调用来源');
+
         if (!previousWord) {
             // 没有上一个单词
+            console.log('没有上一个单词，返回');
             return;
         }
 
@@ -774,6 +779,7 @@
 
     function showWordCard(word) {
         console.log('=== showWordCard 被调用，单词:', word.word, '===');
+        console.trace('调用来源');  // 显示调用栈
         document.getElementById('wordTitle').textContent = word.word;
         document.getElementById('wordChinese').textContent = word.chinese + ' ' + getEmoji(word.word);
 
