@@ -920,6 +920,12 @@
         // 清空反馈区域
         document.getElementById('testFeedbackArea').innerHTML = '';
 
+        // 强制清除testHintEl的颜色状态
+        var testHintEl = document.getElementById('testHint');
+        if (testHintEl) {
+            testHintEl.style.color = '#888';
+        }
+
         // 显示测试内容
         renderTestContent();
     }
@@ -928,6 +934,12 @@
         var testWordEl = document.getElementById('testWord');
         var testHintEl = document.getElementById('testHint');
         var optionsEl = document.getElementById('testOptions');
+
+        // 先清除任何残留的样式状态
+        optionsEl.querySelectorAll('.test-option').forEach(function(opt) {
+            opt.classList.remove('selected', 'correct', 'wrong');
+            opt.style.pointerEvents = 'auto';
+        });
 
         // 清空选项容器，确保没有任何遗留状态
         optionsEl.innerHTML = '';
@@ -1050,6 +1062,13 @@
             setTimeout(function() {
                 console.log('=== 答对，进入下一题 ===');
                 console.log('当前索引从', currentTestIndex, '增加到', currentTestIndex + 1);
+                console.log('下一个单词:', testWordsQueue[currentTestIndex + 1] ? testWordsQueue[currentTestIndex + 1].word : '测试结束');
+
+                // 先清除当前选项的所有样式状态
+                document.querySelectorAll('.test-option').forEach(function(opt) {
+                    opt.classList.remove('correct', 'wrong', 'selected');
+                    opt.style.pointerEvents = 'auto';
+                });
 
                 sessionCorrect++;
                 updateStats(true);
