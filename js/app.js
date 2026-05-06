@@ -918,22 +918,16 @@
     }
 
     function showNextTest() {
-        // 释放测试锁，允许新的点击
-        isTestInProgress = false;
-
         if (currentTestIndex >= testWordsQueue.length) {
             // 测试完成
-            learnedWords = [];  // 清空已学习队列
-            testWordsQueue = [];  // 清空测试队列
+            learnedWords = [];
+            testWordsQueue = [];
             currentTestIndex = 0;
 
-            // 判断下一步
             if (needMatchAfterTest) {
-                // 需要进行连线测试
-                sessionLearnCount = 0;  // 重置累计计数
+                sessionLearnCount = 0;
                 startMatchTest();
             } else {
-                // 切回学习区域，继续学习新单词
                 document.getElementById('testArea').classList.add('hidden');
                 document.getElementById('learnArea').classList.remove('hidden');
                 showNextWordToLearn();
@@ -944,11 +938,9 @@
         currentWord = testWordsQueue[currentTestIndex];
         testAttemptCount = 0;
 
-        // DEBUG: 打印测试流程
         console.log('=== 测试开始 ===');
         console.log('当前测试索引:', currentTestIndex, '/', testWordsQueue.length);
         console.log('当前单词:', currentWord.word);
-        console.log('测试队列:', testWordsQueue.map(function(w) { return w.word; }));
 
         // 固定测试类型为英译中
         currentTestType = TEST_TYPES.CHOOSE_CHINESE;
@@ -957,14 +949,9 @@
 
         // 清空反馈区域
         document.getElementById('testFeedbackArea').innerHTML = '';
+        document.getElementById('testHint').style.color = '#888';
+        document.getElementById('testHint').textContent = '选出正确的中文意思哦~';
 
-        // 强制清除testHintEl的颜色状态
-        var testHintEl = document.getElementById('testHint');
-        if (testHintEl) {
-            testHintEl.style.color = '#888';
-        }
-
-        // 显示测试内容
         renderTestContent();
     }
 
@@ -1073,20 +1060,10 @@
         }
     }
 
-    // ===== 测试结果反馈（在测试页面直接显示） =====
+    // ===== 测试结果反馈 =====
     var testAttemptCount = 0;
-    var isTestInProgress = false;  // 防止重复点击的锁
 
     function showTestFeedback(isCorrect, wrongOption) {
-        // 如果正在处理中，不重复执行
-        if (isTestInProgress) {
-            console.log('=== 测试正在进行，忽略重复点击 ===');
-            return;
-        }
-
-        if (isCorrect) {
-            isTestInProgress = true;  // 设置锁，防止重复点击
-        }
         var feedbackArea = document.getElementById('testFeedbackArea');
         var testHintEl = document.getElementById('testHint');
 
@@ -1094,18 +1071,13 @@
             // 正确 - 播放成功音效
             playSuccessSound();
 
-            // 立即清除所有选项的选中状态，只保留correct状态
-            document.querySelectorAll('.test-option').forEach(function(opt) {
-                opt.classList.remove('selected');
-            });
-
-            // 显示成功反馈（不需要按钮）
+            // 显示成功反馈
             feedbackArea.innerHTML = '<div class="test-feedback correct">' +
                 '<div class="feedback-icon">🎉</div>' +
                 '<div class="feedback-text">' + randomMsg(correctMsg) + '</div>' +
                 '</div>';
 
-            // 禁用所有选项
+            // 禁用所有选项，防止重复点击
             document.querySelectorAll('.test-option').forEach(function(opt) {
                 opt.style.pointerEvents = 'none';
             });
@@ -1113,53 +1085,37 @@
             // 读一遍单词发音
             pronounce(currentWord.word);
 
-            // 1.5秒后自动跳到下一题
+            // 1秒后自动跳到下一题
             setTimeout(function() {
                 console.log('=== 答对，进入下一题 ===');
-                console.log('当前索引从', currentTestIndex, '增加到', currentTestIndex + 1);
-                console.log('下一个单词:', testWordsQueue[currentTestIndex + 1] ? testWordsQueue[currentTestIndex + 1].word : '测试结束');
-
-                // 先清除当前选项的所有样式状态
-                document.querySelectorAll('.test-option').forEach(function(opt) {
-                    opt.classList.remove('correct', 'wrong', 'selected');
-                    opt.style.pointerEvents = 'auto';
-                });
-
                 sessionCorrect++;
                 updateStats(true);
                 if (isReviewMode) {
-                    // 检查是否消灭该错词
                     var cleared = checkWrongWordCleared(currentWord, true);
                     if (cleared) {
                         wrongWordsClearedThisRound++;
-                        // 移除错词（支持总错题库模式）
                         if (isReviewAllWrongMode && currentWord.dir) {
                             removeWrongWord(currentWord.dir, currentWord);
                         } else {
                             removeWrongWord(currentDir, currentWord);
                         }
-                        // 清除该词的计数记录
                         delete wrongWordCorrectCount[currentWord.word];
                     } else {
-                        // 未消灭，更新错词数据
                         updateWrongWordData(currentWord);
                     }
                 }
                 currentTestIndex++;
                 showNextTest();
-            }, 1500);
+            }, 1000);
 
         } else {
             // 错误 - 播放错误提示音
             playErrorSound();
-
             testAttemptCount++;
             sessionWrong++;
 
-            // 复习模式下，标记答错，重置正确计数
             if (isReviewMode) {
                 checkWrongWordCleared(currentWord, false);
-                // 更新错词数据
                 updateWrongWordData(currentWord);
             } else {
                 addWrongWord(currentDir, currentWord);
@@ -1169,20 +1125,15 @@
                 wrongOption.classList.add('wrong');
                 setTimeout(function() {
                     wrongOption.classList.remove('wrong');
-                }, 1000);
+                }, 500);
             }
 
             testHintEl.textContent = '❌ 不对哦，再想想！';
             testHintEl.style.color = '#f44336';
-
             setTimeout(function() {
-                if (currentTestType === TEST_TYPES.CHOOSE_CHINESE) {
-                    testHintEl.textContent = '选出正确的中文意思哦~';
-                } else {
-                    testHintEl.textContent = '选出正确的英文单词哦~';
-                }
+                testHintEl.textContent = '选出正确的中文意思哦~';
                 testHintEl.style.color = '#888';
-            }, 1500);
+            }, 1000);
         }
     }
 
@@ -1469,29 +1420,12 @@
 
     // 选择题答案处理
     function onOptionClick(e) {
-        // 如果正在处理中，忽略点击
-        if (isTestInProgress) {
-            console.log('=== 测试正在进行，忽略点击 ===');
-            return;
-        }
-
         var target = e.target;
         var option = target.closest('.test-option');
         if (!option) return;
 
         var answer = option.dataset.answer;
         if (!answer) return;
-
-        // 先清除所有选项的选中状态（防止移动端hover残留）
-        document.querySelectorAll('.test-option').forEach(function(opt) {
-            opt.classList.remove('selected', 'hover-active');
-            // 强制清除hover样式
-            opt.style.backgroundColor = '';
-            opt.style.borderColor = '';
-            opt.style.color = '';
-            opt.style.transform = '';
-            opt.style.boxShadow = '';
-        });
 
         var isCorrect;
         if (currentTestType === TEST_TYPES.CHOOSE_CHINESE) {
