@@ -1110,12 +1110,46 @@ body {
     border-radius: 10px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 12px;
     border-left: 4px solid #ef5350;
     transition: transform 0.2s;
 }
 
 .wrong-word-item:hover {
     transform: translateX(4px);
+}
+
+.wrong-word-rank {
+    min-width: 28px;
+    height: 28px;
+    background: #ffcc80;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #e65100;
+}
+
+.wrong-word-text {
+    font-weight: 600;
+    color: #2e5a3a;
+    min-width: 80px;
+}
+
+.wrong-word-chinese {
+    color: #666;
+    flex: 1;
+}
+
+.wrong-word-stats {
+    font-size: 0.85rem;
+    color: #888;
+    background: #fff3e0;
+    padding: 4px 8px;
+    border-radius: 6px;
 }
 
 /* 完成页面 */

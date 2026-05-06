@@ -211,6 +211,24 @@
         return 'pet_daily_' + today.getFullYear() + '_' + (today.getMonth() + 1) + '_' + today.getDate();
     }
 
+    // 按难度排序错词（错误次数多的优先，正确次数少的更难）
+    function sortWrongWordsByDifficulty(wrongWords) {
+        return wrongWords.slice().sort(function(a, b) {
+            // 主要按错误次数降序（错误多的更难）
+            var wrongA = a.wrongCount || 0;
+            var wrongB = b.wrongCount || 0;
+            if (wrongA !== wrongB) return wrongB - wrongA;
+
+            // 其次按正确次数升序（正确少的更难）
+            var correctA = a.correctCount || 0;
+            var correctB = b.correctCount || 0;
+            if (correctA !== correctB) return correctA - correctB;
+
+            // 最后按加入时间（早加入的优先）
+            return (a.wrongTime || 0) - (b.wrongTime || 0);
+        });
+    }
+
     function getTodayLearned() {
         var key = getTodayKey();
         var data = localStorage.getItem(key);
@@ -629,12 +647,13 @@
         // 重置错词正确计数
         wrongWordCorrectCount = {};
 
-        // 获取错词详细信息
+        // 获取错词详细信息并按难度排序
         var wrongData = load(KEYS.WRONG_WORDS) || {};
         var dirWrongData = wrongData[currentDir] || [];
 
-        // 复习时：currentWords为错词，但allWords保持为原始目录单词（用于生成选项）
-        currentWords = dirWrongData.map(function(w) {
+        // 复习时：currentWords为错词（按难度排序），但allWords保持为原始目录单词（用于生成选项）
+        var sortedWrongData = sortWrongWordsByDifficulty(dirWrongData);
+        currentWords = sortedWrongData.map(function(w) {
             return {
                 word: w.word,
                 chinese: w.chinese,
@@ -1480,11 +1499,22 @@
 
     function showDirWrongWords(dir) {
         showPage('dir-wrong');
-        document.getElementById('dirWrongTitle').textContent = dir + ' - 错词本';
+        document.getElementById('dirWrongTitle').textContent = dir + ' - 错词本（按难度排序）';
 
         var wrongWords = getWrongWords(dir);
-        var html = wrongWords.map(function(w) {
-            return '<div class="wrong-word-item"><span>' + w.word + '</span><span>' + w.chinese + '</span></div>';
+        // 按难度排序
+        wrongWords = sortWrongWordsByDifficulty(wrongWords);
+
+        var html = wrongWords.map(function(w, idx) {
+            var wrongCount = w.wrongCount || 0;
+            var correctCount = w.correctCount || 0;
+            var difficultyLabel = wrongCount >= 3 ? '🔥难题' : (wrongCount >= 1 ? '⚠️难点' : '');
+            return '<div class="wrong-word-item">' +
+                '<span class="wrong-word-rank">' + (idx + 1) + '</span>' +
+                '<span class="wrong-word-text">' + w.word + '</span>' +
+                '<span class="wrong-word-chinese">' + w.chinese + '</span>' +
+                '<span class="wrong-word-stats">' + difficultyLabel + ' 错' + wrongCount + '/对' + correctCount + '</span>' +
+                '</div>';
         }).join('');
 
         document.getElementById('dirWrongWordsList').innerHTML = html || '<p style="color:#888;">没有错词</p>';
@@ -1563,8 +1593,8 @@
         // 重置错词正确计数
         wrongWordCorrectCount = {};
 
-        // 设置复习单词列表
-        currentWords = allWrongWords.slice();
+        // 按难度排序后设置复习单词列表
+        currentWords = sortWrongWordsByDifficulty(allWrongWords).slice();
         allWordsOriginal = currentWords.slice();  // 用于生成选项
         learnedWords = [];
         currentIndex = 0;
@@ -1601,11 +1631,12 @@
         // 重置错词正确计数
         wrongWordCorrectCount = {};
 
-        // 添加错词的详细信息
+        // 添加错词的详细信息并按难度排序
         var wrongData = load(KEYS.WRONG_WORDS) || {};
         var dirWrongData = wrongData[currentDir] || [];
 
-        currentWords = dirWrongData.map(function(w) {
+        var sortedWrongData = sortWrongWordsByDifficulty(dirWrongData);
+        currentWords = sortedWrongData.map(function(w) {
             return {
                 word: w.word,
                 chinese: w.chinese,
