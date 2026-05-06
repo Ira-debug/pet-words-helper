@@ -783,10 +783,20 @@
     }
 
     // 记住了 - 加入学习队列
+    var isLearningInProgress = false;  // 防止重复点击的锁
+
     function onRemembered() {
+        // 如果正在处理中，忽略点击
+        if (isLearningInProgress) {
+            console.log('=== 学习正在进行，忽略重复点击 ===');
+            return;
+        }
+        isLearningInProgress = true;  // 设置锁
+
         console.log('=== onRemembered 被调用 ===');
         if (!currentWord) {
             console.log('ERROR: currentWord为空');
+            isLearningInProgress = false;
             return;
         }
 
@@ -835,11 +845,26 @@
             console.log('>>> 继续学习下一个单词');
             showNextWordToLearn();
         }
+
+        // 释放锁（延迟释放，确保页面已更新）
+        setTimeout(function() {
+            isLearningInProgress = false;
+        }, 300);
     }
 
     // 不确定 - 加入错词，继续学习
     function onNotSure() {
-        if (!currentWord) return;
+        // 如果正在处理中，忽略点击
+        if (isLearningInProgress) {
+            console.log('=== 学习正在进行，忽略重复点击 ===');
+            return;
+        }
+        isLearningInProgress = true;
+
+        if (!currentWord) {
+            isLearningInProgress = false;
+            return;
+        }
 
         addWrongWord(currentDir, currentWord);
         sessionWrong++;
@@ -870,6 +895,11 @@
         } else {
             showNextWordToLearn();
         }
+
+        // 释放锁
+        setTimeout(function() {
+            isLearningInProgress = false;
+        }, 300);
     }
 
     // ===== 测试流程 =====
