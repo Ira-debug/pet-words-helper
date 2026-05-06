@@ -944,6 +944,11 @@
         // 清空选项容器，确保没有任何遗留状态
         optionsEl.innerHTML = '';
 
+        // 强制触发repaint，确保样式完全清除
+        optionsEl.style.display = 'none';
+        optionsEl.offsetHeight;  // 触发reflow
+        optionsEl.style.display = '';
+
         if (currentTestType === TEST_TYPES.CHOOSE_CHINESE) {
             testWordEl.textContent = currentWord.word;
             testHintEl.textContent = '选出正确的中文意思哦~';
@@ -1043,6 +1048,11 @@
         if (isCorrect) {
             // 正确 - 播放成功音效
             playSuccessSound();
+
+            // 立即清除所有选项的选中状态，只保留correct状态
+            document.querySelectorAll('.test-option').forEach(function(opt) {
+                opt.classList.remove('selected');
+            });
 
             // 显示成功反馈（不需要按钮）
             feedbackArea.innerHTML = '<div class="test-feedback correct">' +
