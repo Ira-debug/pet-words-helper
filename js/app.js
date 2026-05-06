@@ -73,8 +73,14 @@
     function pronounce(text) {
         if (!('speechSynthesis' in window)) return;
 
-        // 强制取消和恢复
+        // 强制取消所有待发音的内容
         window.speechSynthesis.cancel();
+
+        // 清空发音队列
+        while (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+            window.speechSynthesis.cancel();
+            break;  // 只循环一次，cancel会清空队列
+        }
 
         // 创建 utterance
         var utterance = new SpeechSynthesisUtterance(text);
@@ -99,11 +105,9 @@
             window.speechSynthesis.resume();
         };
 
-        // 延迟后发音
-        setTimeout(function() {
-            window.speechSynthesis.speak(utterance);
-            window.speechSynthesis.resume();
-        }, 50);
+        // 直接发音，不延迟（延迟可能导致队列堆积）
+        window.speechSynthesis.speak(utterance);
+        window.speechSynthesis.resume();
     }
 
     // 定期调用 resume 保持引擎活跃（Chrome bug修复）
@@ -761,10 +765,8 @@
         document.getElementById('wordTitle').textContent = word.word;
         document.getElementById('wordChinese').textContent = word.chinese + ' ' + getEmoji(word.word);
 
-        // 自动发音（延迟确保页面已更新）
-        setTimeout(function() {
-            pronounce(word.word);
-        }, 100);
+        // 自动发音（直接发音，不延迟）
+        pronounce(word.word);
     }
 
     // 记住了 - 加入学习队列
@@ -934,10 +936,8 @@
             testWordEl.textContent = currentWord.word;
             testHintEl.textContent = '选出正确的中文意思哦~';
 
-            // 延迟发音
-            setTimeout(function() {
-                pronounce(currentWord.word);
-            }, 100);
+            // 直接发音，不延迟
+            pronounce(currentWord.word);
 
             // 生成中文选项（每次随机不同的干扰项）
             var options = [currentWord.chinese];
