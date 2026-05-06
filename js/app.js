@@ -780,12 +780,20 @@
         sessionLearned++;
         sessionLearnCount++;  // 累计学习数
 
+        // DEBUG: 打印学习流程
+        console.log('=== 学习进度 ===');
+        console.log('刚学会单词:', currentWord.word);
+        console.log('已学习队列长度:', learnedWords.length, '需要达到', learnBatchSize, '才测试');
+        console.log('已学习队列:', learnedWords.map(function(w) { return w.word; }));
+        console.log('剩余单词:', currentWords.length);
+
         if (!isReviewMode) {
             saveProgress(currentDir, currentIndex);
         }
 
         // 检查是否需要开始测试（每3个进行选择题测试）
         if (learnedWords.length >= learnBatchSize) {
+            console.log('>>> 达到测试阈值，开始测试');
             // 检查是否同时也需要连线测试（每6个）
             if (sessionLearnCount >= matchBatchSize) {
                 // 先选择题测试，然后连线测试
@@ -794,6 +802,7 @@
                 startTestSession(false);
             }
         } else if (currentWords.length === 0) {
+            console.log('>>> 没有更多单词，直接开始测试');
             // 如果没有更多单词了，直接开始测试
             startTestSession(sessionLearnCount >= matchBatchSize);
         } else {
@@ -840,6 +849,10 @@
     var needMatchAfterTest = false;  // 测试后是否需要连线测试
 
     function startTestSession(needMatch) {
+        console.log('=== 开始测试会话 ===');
+        console.log('已学习单词数:', learnedWords.length);
+        console.log('是否需要连线测试:', needMatch);
+
         if (learnedWords.length === 0) {
             if (needMatch) {
                 startMatchTest();
@@ -865,6 +878,9 @@
     }
 
     function showNextTest() {
+        // 释放测试锁，允许新的点击
+        isTestInProgress = false;
+
         if (currentTestIndex >= testWordsQueue.length) {
             // 测试完成
             learnedWords = [];  // 清空已学习队列
@@ -887,6 +903,12 @@
 
         currentWord = testWordsQueue[currentTestIndex];
         testAttemptCount = 0;
+
+        // DEBUG: 打印测试流程
+        console.log('=== 测试开始 ===');
+        console.log('当前测试索引:', currentTestIndex, '/', testWordsQueue.length);
+        console.log('当前单词:', currentWord.word);
+        console.log('测试队列:', testWordsQueue.map(function(w) { return w.word; }));
 
         // 随机选择测试类型
         var types = [TEST_TYPES.CHOOSE_CHINESE, TEST_TYPES.CHOOSE_WORD];
@@ -992,8 +1014,18 @@
 
     // ===== 测试结果反馈（在测试页面直接显示） =====
     var testAttemptCount = 0;
+    var isTestInProgress = false;  // 防止重复点击的锁
 
     function showTestFeedback(isCorrect, wrongOption) {
+        // 如果正在处理中，不重复执行
+        if (isTestInProgress) {
+            console.log('=== 测试正在进行，忽略重复点击 ===');
+            return;
+        }
+
+        if (isCorrect) {
+            isTestInProgress = true;  // 设置锁，防止重复点击
+        }
         var feedbackArea = document.getElementById('testFeedbackArea');
         var testHintEl = document.getElementById('testHint');
 
@@ -1017,6 +1049,9 @@
 
             // 1.5秒后自动跳到下一题
             setTimeout(function() {
+                console.log('=== 答对，进入下一题 ===');
+                console.log('当前索引从', currentTestIndex, '增加到', currentTestIndex + 1);
+
                 sessionCorrect++;
                 updateStats(true);
                 if (isReviewMode) {
@@ -1361,6 +1396,12 @@
 
     // 选择题答案处理
     function onOptionClick(e) {
+        // 如果正在处理中，忽略点击
+        if (isTestInProgress) {
+            console.log('=== 测试正在进行，忽略点击 ===');
+            return;
+        }
+
         var target = e.target;
         var option = target.closest('.test-option');
         if (!option) return;
