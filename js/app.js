@@ -789,20 +789,17 @@
     }
 
     // 记住了 - 加入学习队列
-    var isLearningInProgress = false;  // 防止重复点击的锁
-
     function onRemembered() {
-        // 如果正在处理中，忽略点击
-        if (isLearningInProgress) {
-            console.log('=== 学习正在进行，忽略重复点击 ===');
-            return;
-        }
-        isLearningInProgress = true;  // 设置锁
-
         console.log('=== onRemembered 被调用 ===');
         if (!currentWord) {
             console.log('ERROR: currentWord为空');
-            isLearningInProgress = false;
+            return;
+        }
+
+        // 检查是否已经添加过（防止重复点击）
+        var alreadyAdded = learnedWords.some(function(w) { return w.word === currentWord.word; });
+        if (alreadyAdded) {
+            console.log('=== 单词已在学习队列中，跳过重复添加 ===');
             return;
         }
 
@@ -816,16 +813,10 @@
         currentWords.shift();
         currentIndex++;
         sessionLearned++;
-        sessionLearnCount++;  // 累计学习数
+        sessionLearnCount++;
 
         console.log('移除后currentWords剩余:', currentWords.length);
-        console.log('移除后currentWords:', currentWords.map(function(w) { return w.word; }));
         console.log('新的currentIndex:', currentIndex);
-
-        // DEBUG: 打印学习流程
-        console.log('=== 学习进度 ===');
-        console.log('刚学会单词:', currentWord.word);
-        console.log('已学习队列长度:', learnedWords.length, '需要达到', learnBatchSize, '才测试');
         console.log('已学习队列:', learnedWords.map(function(w) { return w.word; }));
 
         if (!isReviewMode) {
@@ -835,54 +826,46 @@
         // 检查是否需要开始测试（每3个进行选择题测试）
         if (learnedWords.length >= learnBatchSize) {
             console.log('>>> 达到测试阈值，开始测试');
-            // 检查是否同时也需要连线测试（每6个）
             if (sessionLearnCount >= matchBatchSize) {
-                // 先选择题测试，然后连线测试
-                startTestSession(true);  // true表示测试后需要连线
+                startTestSession(true);
             } else {
                 startTestSession(false);
             }
         } else if (currentWords.length === 0) {
-            // 没有更多单词了，不足3个就直接结束
             console.log('>>> 没有更多单词，直接结束');
             showComplete();
         } else {
-            // 继续学习
             console.log('>>> 继续学习下一个单词');
             showNextWordToLearn();
         }
-
-        // 释放锁（延迟释放，确保页面已更新）
-        setTimeout(function() {
-            isLearningInProgress = false;
-        }, 300);
     }
 
     // 不确定 - 加入错词，继续学习
     function onNotSure() {
-        // 如果正在处理中，忽略点击
-        if (isLearningInProgress) {
-            console.log('=== 学习正在进行，忽略重复点击 ===');
+        console.log('=== onNotSure 被调用 ===');
+        if (!currentWord) {
+            console.log('ERROR: currentWord为空');
             return;
         }
-        isLearningInProgress = true;
 
-        if (!currentWord) {
-            isLearningInProgress = false;
+        // 检查是否已经添加过（防止重复点击）
+        var alreadyAdded = learnedWords.some(function(w) { return w.word === currentWord.word; });
+        if (alreadyAdded) {
+            console.log('=== 单词已在学习队列中，跳过重复添加 ===');
             return;
         }
 
         addWrongWord(currentDir, currentWord);
         sessionWrong++;
 
-        // 加入已学习队列（也要测试）
+        // 加入已学习队列
         learnedWords.push(currentWord);
 
         // 从待学习队列移除
         currentWords.shift();
         currentIndex++;
         sessionLearned++;
-        sessionLearnCount++;  // 累计学习数
+        sessionLearnCount++;
 
         if (!isReviewMode) {
             saveProgress(currentDir, currentIndex);
@@ -896,16 +879,10 @@
                 startTestSession(false);
             }
         } else if (currentWords.length === 0) {
-            // 没有更多单词了，不足3个就直接结束
             showComplete();
         } else {
             showNextWordToLearn();
         }
-
-        // 释放锁
-        setTimeout(function() {
-            isLearningInProgress = false;
-        }, 300);
     }
 
     // ===== 测试流程 =====
