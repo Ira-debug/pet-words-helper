@@ -68,19 +68,25 @@
     var matchSelectedChinese = null; // 当前选中的中文索引
 
     // ===== 发音功能 =====
-    var lastPronounceText = '';  // 记录上次发音的文本，防止重复
+    var currentPronounceText = '';  // 当前正在发音的文本
 
     function pronounce(text) {
-        if (!('speechSynthesis' in window)) return;
-
-        // 如果和上次发音相同，跳过（防止重复）
-        if (lastPronounceText === text) {
+        console.log('=== pronounce 被调用，文本:', text, '===');
+        if (!('speechSynthesis' in window)) {
+            console.log('speechSynthesis不可用');
             return;
         }
-        lastPronounceText = text;
+
+        // 如果正在发音同一文本，跳过
+        if (currentPronounceText === text && window.speechSynthesis.speaking) {
+            console.log('正在发音同一文本，跳过');
+            return;
+        }
 
         // 强制取消所有待发音的内容
+        console.log('取消之前的发音，当前speaking状态:', window.speechSynthesis.speaking);
         window.speechSynthesis.cancel();
+        currentPronounceText = text;
 
         // 创建 utterance
         var utterance = new SpeechSynthesisUtterance(text);
@@ -94,15 +100,18 @@
             if (enVoice) utterance.voice = enVoice;
         }
 
-        // 发音完成后清除记录，允许再次发音同一文本
+        // 发音完成后清除记录
         utterance.onend = function() {
-            lastPronounceText = '';
+            console.log('=== 发音完成:', text, '===');
+            currentPronounceText = '';
         };
-        utterance.onerror = function() {
-            lastPronounceText = '';
+        utterance.onerror = function(e) {
+            console.log('=== 发音错误:', text, e, '===');
+            currentPronounceText = '';
         };
 
         // 发音
+        console.log('开始发音:', text);
         window.speechSynthesis.speak(utterance);
     }
 
@@ -737,6 +746,10 @@
 
     // ===== 学习流程 =====
     function showNextWordToLearn() {
+        console.log('=== showNextWordToLearn 被调用 ===');
+        console.log('currentWords剩余数量:', currentWords.length);
+        console.log('currentWords内容:', currentWords.map(function(w) { return w.word; }));
+
         if (currentWords.length === 0) {
             // 没有更多单词了，显示完成页面
             showComplete();
@@ -746,24 +759,39 @@
         // 记录当前单词作为上一个单词（用于左滑返回）
         if (currentWord) {
             previousWord = currentWord;
+            console.log('上一个单词:', previousWord.word);
         }
 
         currentWord = currentWords[0];
+        console.log('准备显示单词:', currentWord.word);
+        console.log('调用showWordCard前，wordTitle内容:', document.getElementById('wordTitle').textContent);
+
         showWordCard(currentWord);
         updateLearnProgress();
+
+        console.log('调用showWordCard后，wordTitle内容:', document.getElementById('wordTitle').textContent);
     }
 
     function showWordCard(word) {
+        console.log('=== showWordCard 被调用，单词:', word.word, '===');
         document.getElementById('wordTitle').textContent = word.word;
         document.getElementById('wordChinese').textContent = word.chinese + ' ' + getEmoji(word.word);
 
-        // 自动发音（直接发音，不延迟）
+        // 发音
         pronounce(word.word);
+        console.log('=== showWordCard 完成 ===');
     }
 
     // 记住了 - 加入学习队列
     function onRemembered() {
-        if (!currentWord) return;
+        console.log('=== onRemembered 被调用 ===');
+        if (!currentWord) {
+            console.log('ERROR: currentWord为空');
+            return;
+        }
+
+        console.log('当前单词:', currentWord.word);
+        console.log('当前currentIndex:', currentIndex);
 
         // 加入已学习队列
         learnedWords.push(currentWord);
@@ -774,12 +802,15 @@
         sessionLearned++;
         sessionLearnCount++;  // 累计学习数
 
+        console.log('移除后currentWords剩余:', currentWords.length);
+        console.log('移除后currentWords:', currentWords.map(function(w) { return w.word; }));
+        console.log('新的currentIndex:', currentIndex);
+
         // DEBUG: 打印学习流程
         console.log('=== 学习进度 ===');
         console.log('刚学会单词:', currentWord.word);
         console.log('已学习队列长度:', learnedWords.length, '需要达到', learnBatchSize, '才测试');
         console.log('已学习队列:', learnedWords.map(function(w) { return w.word; }));
-        console.log('剩余单词:', currentWords.length);
 
         if (!isReviewMode) {
             saveProgress(currentDir, currentIndex);
@@ -797,9 +828,11 @@
             }
         } else if (currentWords.length === 0) {
             // 没有更多单词了，不足3个就直接结束
+            console.log('>>> 没有更多单词，直接结束');
             showComplete();
         } else {
             // 继续学习
+            console.log('>>> 继续学习下一个单词');
             showNextWordToLearn();
         }
     }
